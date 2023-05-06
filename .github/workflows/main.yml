@@ -4,10 +4,9 @@ on:
   push:
     branches: ["main"]
 #   workflow_dispatch:
-
   
 jobs:
-  BuildImage:
+  BuildAndPushImageToACR:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -23,22 +22,21 @@ jobs:
           username: ${{secrets.ACS_USERNAME}}
           password: ${{secrets.ACS_PASSWD}}
           # Container registry server url
-          login-server:  ${{secrets.ACS_LOGIN_SERVER}}
+          login-server:  ${{vars.ACS_LOGIN_SERVER}}
         
       - name: Build and push
         uses: docker/build-push-action@v4
         with:
           context: .
           push: true
-          tags: ${{secrets.ACS_LOGIN_SERVER}}/${{vars.IMAGE_NAME}}:${{github.sha}}
+          tags: ${{vars.ACS_LOGIN_SERVER}}/${{vars.IMAGE_NAME}}:${{github.sha}}
           file: ./Dockerfile
           
-  PushImageToACR:
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo "something"
-  
   DeployAppToAKS:
     runs-on: ubuntu-latest
+    needs: [BuildAndPushImageToACR]
     steps:
-      - run: echo "somtehing"
+      - name: Checkout
+        uses: actions/checkout@v3
+      
+        
