@@ -44,6 +44,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         
+      # github actions login azure
       - name: 'Az CLI login'
         uses: azure/login@v1
         with:
@@ -51,9 +52,30 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           
+      # github actions login k8s
       - name: setup kubernetes login
         uses: azure/use-kubelogin@v1
         with:
           kubelogin-version: 'v0.0.24'
       
-        
+      # github actions set k8s context
+      - name: set k8s context
+        uses: azure/aks-set-context@v3
+        with:
+           resource-group: ${{vars.RESOURCE_GROUP}}
+           cluster-name: ${{AKS_CLUSTER_NAME}}
+           subscription: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+           admin: 'false'
+           use-kubelogin: 'true'
+           
+      # deploy our node app depmoyment.yaml and sevice.yaml to k8s cluster
+      - name: deploy node app to k8s
+        uses: Azure/k8s-deploy@v4
+        with:
+           namespace: 'myapp'
+           manifests: |
+              kubernetes/hello-world-deployment.yaml
+              kubernetes/hello-world-service.yaml
+           images: ${{vars.ACS_LOGIN_SERVER}}/${{vars.IMAGE_NAME}}:${{github.sha}}
+
+
