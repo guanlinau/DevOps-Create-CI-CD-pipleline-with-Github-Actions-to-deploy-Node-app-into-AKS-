@@ -84,7 +84,7 @@ jobs:
             hello-world-deployment.yaml
             
       # Assign k8s permission to pull image from ACR
-      - run: az aks update -n ${{vars.AKS_CLUSTER_NAME}} -g ${{vars.RESOURCE_GROUP}} --attach-acr ${{vars.AZURE_CONTAINER_REGISTRY}}
+      #- run: az aks update -n ${{vars.AKS_CLUSTER_NAME}} -g ${{vars.RESOURCE_GROUP}} --attach-acr ${{vars.AZURE_CONTAINER_REGISTRY}}
       
       # deploy our node app depmoyment.yaml and sevice.yaml to k8s cluster
       - name: deploy node app to k8s
