@@ -67,13 +67,29 @@ jobs:
            subscription: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
            admin: 'false'
            use-kubelogin: 'true'
-           
+      
+      # Substitute environment varibales in deployment.yaml file
+      - name: envsubst-action
+        uses: danielr1996/envsubst-action@1.1.0
+        env: 
+          MONGODB_URI: ${{secrets.MONGODB_URI}}
+          AZURE_CONTAINER_REGISTRY: ${{vars.ACS_LOGIN_SERVER}}
+          CONTAINER_NAME: '{{vars.IMAGE_NAME}}:${{github.sha}}'
+        with:
+          # a file to run substitutes on 
+          input: 
+            kubernetes/hello-world-deployment.yaml
+          # file to write result into
+          output:
+            hello-world-deployment.yaml
+            
       # deploy our node app depmoyment.yaml and sevice.yaml to k8s cluster
       - name: deploy node app to k8s
         uses: Azure/k8s-deploy@v4
         with:
            manifests: |
-              kubernetes/hello-world-deployment.yaml
+              # receive the env variables from envsub
+              hello-world-deployment.yaml
               kubernetes/hello-world-service.yaml
            images: ${{vars.ACS_LOGIN_SERVER}}/${{vars.IMAGE_NAME}}:${{github.sha}}
 
