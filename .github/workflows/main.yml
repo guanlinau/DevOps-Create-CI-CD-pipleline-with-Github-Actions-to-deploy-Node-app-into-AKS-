@@ -74,7 +74,7 @@ jobs:
         env: 
           MONGODB_URI: ${{secrets.MONGODB_URI}}
           AZURE_CONTAINER_REGISTRY: ${{vars.ACS_LOGIN_SERVER}}
-          CONTAINER_NAME: node_app:${{github.sha}}
+          CONTAINER_NAME: ${{vars.IMAGE_NAME}}:${{github.sha}}
         with:
           # a file to run substitutes on 
           input: 
