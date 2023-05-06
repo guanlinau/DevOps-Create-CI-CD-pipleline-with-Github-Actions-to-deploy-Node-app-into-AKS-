@@ -91,7 +91,6 @@ jobs:
         uses: Azure/k8s-deploy@v4
         with:
            manifests: |
-              # receive the env variables from envsub
               hello-world-deployment.yaml
               kubernetes/hello-world-service.yaml
            images: ${{vars.ACS_LOGIN_SERVER}}/${{vars.IMAGE_NAME}}:${{github.sha}}
