@@ -9,35 +9,31 @@ jobs:
   BuildImage:
     runs-on: ubuntu-latest
     steps:
-      - run: |
-          echo ${{secrets.ACS_USERNAME}}
-      - run: | 
-          echo "${{secrets.ACS_USERNAME}}"
-      - run: |
-          example-command "${{secrets.ACS_USERNAME}}"
+      - run: echo ${{vars.IMAGE_NAME}}
+      - run: echo "${{vars.IMAGE_NAME}}"
       
-      - name: Checkout
-        uses: actions/checkout@v3
+#       - name: Checkout
+#         uses: actions/checkout@v3
         
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+#       - name: Set up Docker Buildx
+#         uses: docker/setup-buildx-action@v2
         
-      - name: Azure Container Registry Login
-        uses: Azure/docker-login@v1
-        with:
-          # Container registry username
-          username: 'node0506'
-          password: 'CejKN3jv5YsH63cBSLVngnc0D6SZWK9g4y6wjmHd54+ACRC9GWQe'
-          # Container registry server url
-          login-server: 'node0506.azurecr.io'
+#       - name: Azure Container Registry Login
+#         uses: Azure/docker-login@v1
+#         with:
+#           # Container registry username
+#           username: 'node0506'
+#           password: 'CejKN3jv5YsH63cBSLVngnc0D6SZWK9g4y6wjmHd54+ACRC9GWQe'
+#           # Container registry server url
+#           login-server: 'node0506.azurecr.io'
         
-      - name: Build and push
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          push: true
-          tags: node0506.azurecr.io/node_app:${{github.sha}}
-          file: ./Dockerfile
+#       - name: Build and push
+#         uses: docker/build-push-action@v4
+#         with:
+#           context: .
+#           push: true
+#           tags: node0506.azurecr.io/node_app:${{github.sha}}
+#           file: ./Dockerfile
           
   PushImageToACR:
     runs-on: ubuntu-latest
