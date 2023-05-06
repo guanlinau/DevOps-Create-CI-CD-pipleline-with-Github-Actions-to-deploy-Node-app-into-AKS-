@@ -81,7 +81,7 @@ jobs:
             kubernetes/hello-world-deployment.yaml
           # file to write result into
           output:
-            hello-world-deployment.yaml
+            kubernetes/hello-world-deployment.yaml
             
       # deploy our node app depmoyment.yaml and sevice.yaml to k8s cluster
       - name: deploy node app to k8s
@@ -89,7 +89,7 @@ jobs:
         with:
            manifests: |
               # receive the env variables from envsub
-              hello-world-deployment.yaml
+              kubernetes/hello-world-deployment.yaml
               kubernetes/hello-world-service.yaml
            images: ${{vars.ACS_LOGIN_SERVER}}/${{vars.IMAGE_NAME}}:${{github.sha}}
 
