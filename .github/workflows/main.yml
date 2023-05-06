@@ -1,0 +1,43 @@
+name: GitHub Actions Deploy Nodeapp-into-AKS
+run-name: ${{ github.actor }} is triggering the GitHub Actions 🚀
+on: 
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+  
+jobs:
+  BuildImage:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+        
+      - name: Azure Container Registry Login
+        uses: Azure/docker-login@v1
+        with:
+          # Container registry username
+          username: ${{ACS_USERNAME}}
+          password: ${{ACS_PASSWD}}
+          # Container registry server url
+          login-server: ${{ACS_LOGIN_SERVER}}
+        
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          tags: ${{ACS_LOGIN_SERVER}}/${{IMAGE_NAME}}:${{github.sha}}
+          file: ./Dockerfile
+          
+  PushImageToACR:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "something"
+  
+  DeployAppToAKS:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "somtehing"
