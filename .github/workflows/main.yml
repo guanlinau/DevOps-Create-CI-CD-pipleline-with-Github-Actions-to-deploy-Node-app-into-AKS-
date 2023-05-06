@@ -4,6 +4,13 @@ on:
   push:
     branches: ["main"]
 #   workflow_dispatch:
+
+env:
+  ACS_USERNAME: ${{secrets.ACS_USERNAME}},
+  ACS_PASSWD: ${{secrets.ACS_PASSWD}},
+  ACS_LOGIN_SERVER: ${{secrets.ACS_LOGIN_SERVER}},
+  IMAGE_NAME: ${{vars.IMAGE_NAME}},
+  IMAGE_VERSION: ${{github.sha}},
   
 jobs:
   BuildImage:
@@ -19,17 +26,17 @@ jobs:
         uses: Azure/docker-login@v1
         with:
           # Container registry username
-          username: ${{secrets.ACS_USERNAME}}
-          password: ${{secrets.ACS_PASSWD}}
+          username: $ACS_USERNAME
+          password: $ACS_PASSWD
           # Container registry server url
-          login-server: ${{secrets.ACS_LOGIN_SERVER}}
+          login-server: $ACS_LOGIN_SERVER
         
       - name: Build and push
         uses: docker/build-push-action@v4
         with:
           context: .
           push: true
-          tags: ${{secrets.ACS_LOGIN_SERVER}}/${{vars.IMAGE_NAME}}:${{github.sha}}
+          tags: $ACS_LOGIN_SERVER/$IMAGE_NAME:$IMAGE_VERSION
           file: ./Dockerfile
           
   PushImageToACR:
