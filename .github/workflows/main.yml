@@ -9,8 +9,12 @@ jobs:
   BuildImage:
     runs-on: ubuntu-latest
     steps:
-      - run: echo ${{secrets.ACS_USERNAME}}
-      - run: echo "${{secrets.ACS_USERNAME}}"
+      - run: |
+          echo ${{secrets.ACS_USERNAME}}
+      - run: | 
+          echo "${{secrets.ACS_USERNAME}}"
+      - run: |
+          example-command "${{secrets.ACS_USERNAME}}"
       
       - name: Checkout
         uses: actions/checkout@v3
