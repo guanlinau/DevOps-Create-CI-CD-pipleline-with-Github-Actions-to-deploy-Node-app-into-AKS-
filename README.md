@@ -31,3 +31,38 @@ Design a GitHub Actions workflow to achieve CI/CD.
 7- Grafana displays visualization of infrastructure and application metrics via Azure Monitor.
 
 8- Monitor application and make improvements.
+
+## Secret and variables
+
+Secret:
+ACS_PASSWD=
+ACS_USERNAME=
+AZURE_CLIENT_ID=
+AZURE_SUBSCRIPTION_ID=
+AZURE_TENANT_ID=
+MONGODB_URI=
+
+Variables
+ACS_LOGIN_SERVER=
+AKS_CLUSTER_NAME=
+AZURE_CONTAINER_REGISTRY=
+IMAGE_NAME=
+RESOURCE_GROUP=
+
+Sample
+
+![image](images/Screenshot%202023-05-14%20at%209.58.35%20pm.png)
+![image](images/Screenshot%202023-05-14%20at%209.58.28%20pm.png)
+
+## Output
+
+![image](images/Screenshot%202023-05-14%20at%208.31.23%20pm.png)
+![image](images/Screenshot%202023-05-14%20at%209.49.50%20pm.png)
+![image](images/Screenshot%202023-05-14%20at%209.50.00%20pm.png)
+![image](images/Screenshot%202023-05-14%20at%209.50.07%20pm.png)
+![image](images/Screenshot%202023-05-14%20at%209.49.50%20pm.png)
+![image](images/Screenshot%202023-05-14%20at%209.48.58%20pm.png)
+![image](images/Screenshot%202023-05-14%20at%209.49.10%20pm.png)
+![image](images/Screenshot%202023-05-14%20at%209.49.23%20pm.png)
+![image](images/Screenshot%202023-05-14%20at%209.49.41%20pm.png)
+![image](images/Screenshot%202023-05-14%20at%209.49.32%20pm.png)
