@@ -72,7 +72,7 @@ jobs:
       - name: setup -kubectl
         uses: azure/setup-kubectl@v3
         with:
-          version: "lastest" # default is latest stable
+          version: "latest" # default is latest stable
         id: install
 
       - name: substitute environment varibales in deployment.yaml file
