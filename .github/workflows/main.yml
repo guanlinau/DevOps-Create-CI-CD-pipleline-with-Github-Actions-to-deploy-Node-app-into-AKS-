@@ -1,24 +1,24 @@
 name: GitHub Actions Deploy Nodeapp-into-AKS
 run-name: ${{github.actor}} is triggering the GitHub Actions 🚀
-on: 
+on:
   push:
     branches: ["main"]
 #   workflow_dispatch:
 permissions:
-   id-token: write
-   contents: read
-   actions: read
-  
+  id-token: write
+  contents: read
+  actions: read
+
 jobs:
   BuildAndPushImageToACR:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-        
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
-        
+
       - name: Azure Container Registry Login
         uses: Azure/docker-login@v1
         with:
@@ -26,8 +26,8 @@ jobs:
           username: ${{secrets.ACS_USERNAME}}
           password: ${{secrets.ACS_PASSWD}}
           # Container registry server url
-          login-server:  ${{secrets.ACS_LOGIN_SERVER}}
-        
+          login-server: ${{vars.ACS_LOGIN_SERVER}}
+
       - name: Build and push
         uses: docker/build-push-action@v4
         with:
@@ -35,7 +35,7 @@ jobs:
           push: true
           tags: ${{vars.ACS_LOGIN_SERVER}}/${{vars.IMAGE_NAME}}:${{github.sha}}
           file: ./Dockerfile
-          
+
   DeployAppToAKS:
     runs-on: ubuntu-latest
     needs: [BuildAndPushImageToACR]
@@ -43,56 +43,52 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-        
+
       # github actions login azure
-      - name: 'Az CLI login'
+      - name: "Az CLI login"
         uses: azure/login@v1
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          
+
       # github actions login k8s
       - name: setup kubernetes login
         uses: azure/use-kubelogin@v1
         with:
-          kubelogin-version: 'v0.0.24'
-      
+          kubelogin-version: "v0.0.24"
+
       # github actions set k8s context
       - name: set k8s context
         uses: azure/aks-set-context@v3
         with:
-           resource-group: ${{vars.RESOURCE_GROUP}}
-           cluster-name: ${{vars.AKS_CLUSTER_NAME}}
-           subscription: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-           admin: 'false'
-           use-kubelogin: 'true'
-      
+          resource-group: ${{vars.RESOURCE_GROUP}}
+          cluster-name: ${{vars.AKS_CLUSTER_NAME}}
+          subscription: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          admin: "false"
+          use-kubelogin: "true"
+
       # Substitute environment varibales in deployment.yaml file
       - name: envsubst-action
         uses: danielr1996/envsubst-action@1.1.0
-        env: 
+        env:
           MONGODB_URI: ${{secrets.MONGODB_URI}}
           AZURE_CONTAINER_REGISTRY: ${{vars.ACS_LOGIN_SERVER}}
           CONTAINER_NAME: ${{vars.IMAGE_NAME}}:${{github.sha}}
         with:
-          # a file to run substitutes on 
-          input: 
-            kubernetes/hello-world-deployment.yaml
+          # a file to run substitutes on
+          input: kubernetes/hello-world-deployment.yaml
           # file to write result into
-          output:
-            hello-world-deployment.yaml
-            
+          output: hello-world-deployment.yaml
+
       # Assign k8s permission to pull image from ACR
       #- run: az aks update -n ${{vars.AKS_CLUSTER_NAME}} -g ${{vars.RESOURCE_GROUP}} --attach-acr ${{vars.AZURE_CONTAINER_REGISTRY}}
-      
+
       # deploy our node app depmoyment.yaml and sevice.yaml to k8s cluster
       - name: deploy node app to k8s
         uses: Azure/k8s-deploy@v4
         with:
-           manifests: |
-              hello-world-deployment.yaml
-              kubernetes/hello-world-service.yaml
-           images: ${{vars.ACS_LOGIN_SERVER}}/${{vars.IMAGE_NAME}}:${{github.sha}}
-
-
+          manifests: |
+            hello-world-deployment.yaml
+            kubernetes/hello-world-service.yaml
+          images: ${{vars.ACS_LOGIN_SERVER}}/${{vars.IMAGE_NAME}}:${{github.sha}}
