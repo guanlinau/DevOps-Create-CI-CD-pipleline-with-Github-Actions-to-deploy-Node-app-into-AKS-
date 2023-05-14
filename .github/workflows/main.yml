@@ -76,12 +76,10 @@ jobs:
         id: install
 
       - name: substitute environment varibales in deployment.yaml file
-        env:
-          MONGODB_URI: ${{secrets.MONGODB_URI}}
-          AZURE_CONTAINER_REGISTRY: ${{vars.ACS_LOGIN_SERVER}}
-          CONTAINER_NAME: ${{vars.IMAGE_NAME}}:${{github.sha}}
         run: |
-          echo $GITHUB_ENV
+          echo "MONGODB_URI=${{secrets.MONGODB_URI}}" >> "$GITHUB_ENV"
+          echo "AZURE_CONTAINER_REGISTRY=${{vars.ACS_LOGIN_SERVER}}" >> "$GITHUB_ENV"
+          echo "CONTAINER_NAME=${{vars.IMAGE_NAME}}:${{github.sha}}" >> "$GITHUB_ENV"
           envsubst < kubernetes/hello-world-deployment.yaml | kubectl apply -f -
 
       # Substitute environment varibales in deployment.yaml file
