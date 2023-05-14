@@ -26,14 +26,14 @@ jobs:
           username: ${{secrets.ACS_USERNAME}}
           password: ${{secrets.ACS_PASSWD}}
           # Container registry server url
-          login-server:  ${{vars.ACS_LOGIN_SERVER}}
+          login-server:  ${{secrets.ACS_LOGIN_SERVER}}
         
       - name: Build and push
         uses: docker/build-push-action@v4
         with:
           context: .
           push: true
-          tags: ${{vars.ACS_LOGIN_SERVER}}/${{vars.IMAGE_NAME}}:${{github.sha}}
+          tags: ${{secrets.ACS_LOGIN_SERVER}}/${{vars.IMAGE_NAME}}:${{github.sha}}
           file: ./Dockerfile
           
   DeployAppToAKS:
@@ -63,7 +63,7 @@ jobs:
         uses: azure/aks-set-context@v3
         with:
            resource-group: ${{vars.RESOURCE_GROUP}}
-           cluster-name: ${{vars.AKS_CLUSTER_NAME}}
+           cluster-name: ${{secrets.AKS_CLUSTER_NAME}}
            subscription: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
            admin: 'false'
            use-kubelogin: 'true'
@@ -73,7 +73,7 @@ jobs:
         uses: danielr1996/envsubst-action@1.1.0
         env: 
           MONGODB_URI: ${{secrets.MONGODB_URI}}
-          AZURE_CONTAINER_REGISTRY: ${{vars.ACS_LOGIN_SERVER}}
+          AZURE_CONTAINER_REGISTRY: ${{secrets.ACS_LOGIN_SERVER}}
           CONTAINER_NAME: ${{vars.IMAGE_NAME}}:${{github.sha}}
         with:
           # a file to run substitutes on 
@@ -84,7 +84,7 @@ jobs:
             hello-world-deployment.yaml
             
       # Assign k8s permission to pull image from ACR
-      #- run: az aks update -n ${{vars.AKS_CLUSTER_NAME}} -g ${{vars.RESOURCE_GROUP}} --attach-acr ${{vars.AZURE_CONTAINER_REGISTRY}}
+      #- run: az aks update -n ${{secrets.AKS_CLUSTER_NAME}} -g ${{vars.RESOURCE_GROUP}} --attach-acr ${{vars.AZURE_CONTAINER_REGISTRY}}
       
       # deploy our node app depmoyment.yaml and sevice.yaml to k8s cluster
       - name: deploy node app to k8s
@@ -93,6 +93,6 @@ jobs:
            manifests: |
               hello-world-deployment.yaml
               kubernetes/hello-world-service.yaml
-           images: ${{vars.ACS_LOGIN_SERVER}}/${{vars.IMAGE_NAME}}:${{github.sha}}
+           images: ${{secrets.ACS_LOGIN_SERVER}}/${{vars.IMAGE_NAME}}:${{github.sha}}
 
 
