@@ -68,32 +68,18 @@ jobs:
           admin: "false"
           use-kubelogin: "true"
 
-      # Install kubectl
-      - name: setup -kubectl
-        uses: azure/setup-kubectl@v3
-        with:
-          version: "latest" # default is latest stable
-        id: install
-
-      - name: substitute environment varibales in deployment.yaml file
-        run: |
-          echo "MONGODB_URI=${{secrets.MONGODB_URI}}" >> "$GITHUB_ENV"
-          echo "AZURE_CONTAINER_REGISTRY=${{vars.ACS_LOGIN_SERVER}}" >> "$GITHUB_ENV"
-          echo "CONTAINER_NAME=${{vars.IMAGE_NAME}}:${{github.sha}}" >> "$GITHUB_ENV"
-          envsubst < kubernetes/hello-world-deployment.yaml | kubectl apply -f -
-
       # Substitute environment varibales in deployment.yaml file
-      # - name: envsubst-action
-      #   uses: danielr1996/envsubst-action@1.1.0
-      #   env:
-      #     MONGODB_URI: ${{secrets.MONGODB_URI}}
-      #     AZURE_CONTAINER_REGISTRY: ${{vars.ACS_LOGIN_SERVER}}
-      #     CONTAINER_NAME: ${{vars.IMAGE_NAME}}:${{github.sha}}
-      #   with:
-      #     # a file to run substitutes on
-      #     input: kubernetes/hello-world-deployment.yaml
-      #     # file to write result into
-      #     output: hello-world-deployment.yaml
+      - name: envsubst-action
+        uses: danielr1996/envsubst-action@1.1.0
+        env:
+          MONGODB_URI: ${{secrets.MONGODB_URI}}
+          AZURE_CONTAINER_REGISTRY: ${{vars.ACS_LOGIN_SERVER}}
+          CONTAINER_NAME: ${{vars.IMAGE_NAME}}:${{github.sha}}
+        with:
+          # a file to run substitutes on
+          input: kubernetes/hello-world-deployment.yaml
+          # file to write result into
+          output: hello-world-deployment.yaml
 
       # Assign k8s permission to pull image from ACR
       #- run: az aks update -n ${{vars.AKS_CLUSTER_NAME}} -g ${{vars.RESOURCE_GROUP}} --attach-acr ${{vars.AZURE_CONTAINER_REGISTRY}}
@@ -103,6 +89,6 @@ jobs:
         uses: Azure/k8s-deploy@v4
         with:
           manifests: |
-            kubernetes/hello-world-deployment.yaml 
+            hello-world-deployment.yaml 
             kubernetes/hello-world-service.yaml
           images: ${{vars.ACS_LOGIN_SERVER}}/${{vars.IMAGE_NAME}}:${{github.sha}}
